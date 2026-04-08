@@ -120,7 +120,6 @@ export const getDailyProfitByMonth = async (req: Request, res: Response) => {
     const byDate = new Map<string, typeof schedules>();
     for (const row of schedules) {
       const adjustedDate = new Date(row.date);
-      adjustedDate.setUTCDate(adjustedDate.getUTCDate() + 1);
       const key = adjustedDate.toISOString().split("T")[0];
       const dayRows = byDate.get(key) || [];
       dayRows.push(row);
