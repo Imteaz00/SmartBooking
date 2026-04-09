@@ -2,7 +2,6 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { fetchDailyProfitByMonth } from "@/actions/fetchDailyProfitByMonth";
 
@@ -11,10 +10,17 @@ export default function Home() {
 
   const [profitData, setProfitData] = useState<Record<string, number>>({});
 
-  function getHeatColor(date: Date) {
-    const profit = profitData[format(date, "yyyy-MM-dd")];
+  function toLocalDateKey(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-    if (!profit) return "";
+  function getHeatColor(date: Date) {
+    const profit = profitData[toLocalDateKey(date)];
+
+    if (profit === undefined) return "";
 
     if (profit < 50000) return "bg-red-200";
     if (profit < 100000) return "bg-yellow-200";
@@ -51,13 +57,13 @@ export default function Home() {
           className="rounded-md border p-3 w-full"
           onMonthChange={(date) => handleMonth(date)}
           onDayClick={(date) => {
-            const formatted = format(date, "yyyy-MM-dd");
+            const formatted = toLocalDateKey(date);
             router.push(`${formatted}`);
           }}
           modifiers={{
             profitable: (date) => {
-              const key = format(date, "yyyy-MM-dd");
-              return !!profitData[key];
+              const key = toLocalDateKey(date);
+              return profitData[key] !== undefined;
             },
           }}
           modifiersClassNames={{

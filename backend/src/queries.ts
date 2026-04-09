@@ -14,7 +14,7 @@ export const getAllSlots = async () => {
 };
 
 export const getAllEvents = async () => {
-  const events = await db.query.event.findMany();
+  const events = await db.query.event.findMany({ orderBy: (e, { asc }) => [asc(e.size)] });
   return events;
 };
 

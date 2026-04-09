@@ -1,11 +1,14 @@
 "use server";
 
 import { BACKEND_URL } from "@/server";
-import { format } from "date-fns";
 
 export async function fetchDailyProfitByMonth(date: Date) {
   try {
-    const formattedDate = format(date, "yyyy-MM-dd");
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+
     const response = await fetch(`${BACKEND_URL}/schedule/dailyProfitByMonth/${formattedDate}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch daily profit: ${response.statusText}`);
