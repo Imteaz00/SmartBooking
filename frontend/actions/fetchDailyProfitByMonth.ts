@@ -4,7 +4,11 @@ import { BACKEND_URL } from "@/server";
 
 export async function fetchDailyProfitByMonth(date: Date) {
   try {
-    const formattedDate = date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const formattedDate = `${year}-${month}`;
+
+    console.log(`Fetching daily profit for month: ${formattedDate}`);
 
     const response = await fetch(`${BACKEND_URL}/schedule/dailyProfitByMonth/${formattedDate}`);
     if (!response.ok) {
