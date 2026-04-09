@@ -192,7 +192,6 @@ export const getDailyProfitByMonth = async (req: Request, res: Response) => {
           return [day, Math.round(netProfit)] as const;
         }),
     );
-    console.log(profitByDate);
     return res.json(profitByDate);
   } catch (error) {
     console.error("Error fetching monthly schedule:", error);
@@ -216,10 +215,10 @@ export const getLastSlots = async (req: Request, res: Response) => {
   try {
     const day = new Date(req.params.day as string);
     const schedule = await queries.getScheduleByDate(day);
-    const lastSlots = schedule.filter((row) => row.slotId == 4);
+    const lastSlots = schedule.filter((row) => row.slotId === 4);
     res.json(lastSlots);
   } catch (error) {
-    console.error("Error fetching previous day's last slots:", error);
-    res.status(500).json({ error: "An error occurred while fetching previous day's last slots." });
+    console.error("Error fetching last slots:", error);
+    res.status(500).json({ error: "An error occurred while fetching last slots." });
   }
 };
