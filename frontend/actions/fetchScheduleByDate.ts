@@ -9,7 +9,6 @@ export default async function fetchScheduleByDate(date: Date) {
     const day = String(date.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
 
-    console.log(`Fetching schedule for date: ${formattedDate}`);
     const res = await fetch(`${BACKEND_URL}/schedule/${formattedDate}`);
     if (!res.ok) {
       throw new Error(`Server error: ${res.statusText}`);
