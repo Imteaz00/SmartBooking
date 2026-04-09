@@ -29,12 +29,12 @@ export default function Home() {
   }
 
   useEffect(() => {
-    handleMonth(new Date());
+    handleMonth({ month: new Date().getMonth(), year: new Date().getFullYear() });
   }, []);
 
-  async function handleMonth(date: Date) {
+  async function handleMonth({ month, year }: { month: number; year: number }) {
     try {
-      const data = await fetchDailyProfitByMonth(date);
+      const data = await fetchDailyProfitByMonth({ month, year });
       setProfitData((data || {}) as Record<string, number>);
     } catch (error) {
       console.error("Error loading monthly profit data:", error);
@@ -55,7 +55,9 @@ export default function Home() {
           mode="single"
           captionLayout="dropdown"
           className="rounded-md border p-3 w-full"
-          onMonthChange={(date) => handleMonth(date)}
+          onMonthChange={(date) =>
+            handleMonth({ year: date.getFullYear(), month: date.getMonth() })
+          }
           onDayClick={(date) => {
             const formatted = toLocalDateKey(date);
             router.push(`${formatted}`);
