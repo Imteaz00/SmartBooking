@@ -211,3 +211,15 @@ export const saveSchedules = async (req: Request, res: Response) => {
     res.status(500).json({ error: "An error occurred while saving schedules." });
   }
 };
+
+export const getLastSlots = async (req: Request, res: Response) => {
+  try {
+    const day = new Date(req.params.day as string);
+    const schedule = await queries.getScheduleByDate(day);
+    const lastSlots = schedule.filter((row) => row.slotId == 4);
+    res.json(lastSlots);
+  } catch (error) {
+    console.error("Error fetching previous day's last slots:", error);
+    res.status(500).json({ error: "An error occurred while fetching previous day's last slots." });
+  }
+};

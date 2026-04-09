@@ -12,10 +12,12 @@ import runHillClimbing from "@/actions/runHillClimbing";
 import saveSchedules from "@/actions/saveSchedules";
 import Link from "next/link";
 import fetchScheduleByDate from "@/actions/fetchScheduleByDate";
+import { fetchPrevDayLastSlots } from "@/actions/fetchPrevDayLastSlots";
 
 export default function SchedulerPage() {
   const { day } = useParams<{ day: string }>();
   const [bookings, setBookings] = useState<Schedule[]>([]);
+  const [prevBookings, setPrevBookings] = useState<Schedule[]>([]);
 
   const [events, setEvents] = useState<Event[]>([]);
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -34,7 +36,13 @@ export default function SchedulerPage() {
     fetchScheduleByDate(new Date(day)).then((fetchedSchedule) => {
       setBookings(fetchedSchedule);
     });
+    fetchPrevDayLastSlots(new Date(day)).then((fetchedPrevSlots) => {
+      setPrevBookings(fetchedPrevSlots);
+    });
   }, []);
+
+  console.log("Current bookings:", bookings);
+  console.log("Previous bookings:", prevBookings);
 
   const month = Number((day ?? "").split("-")[1] ?? "1");
   const isWinter = month === 11 || month === 12 || month === 1 || month === 2;
@@ -57,6 +65,7 @@ export default function SchedulerPage() {
         return prev.map((b, i) => (i === existing ? { slotId, venueName, eventSize } : b));
       }
       if (eventSize === 0) return prev; // Don't add if eventSize is 0
+      if (!!prevBookings.find((b) => b.venueName === venueName && slotId === 1)) return prev; // Don't add if previous day has booking for slot 1 (rest and clean)
       return [...prev, { slotId, venueName, eventSize }];
     });
   };
@@ -162,7 +171,9 @@ export default function SchedulerPage() {
       alert("Error running greedy algorithm: " + greedyBookings.error);
       return;
     }
-    setBookings(greedyBookings as Schedule[]);
+    greedyBookings.forEach((booking) => {
+      updateBooking(booking.venueName, booking.slotId, booking.eventSize);
+    });
   };
 
   const handleOptimizer = async () => {
@@ -172,7 +183,9 @@ export default function SchedulerPage() {
       alert("Error running optimization: " + optimizedBookings.error);
       return;
     }
-    setBookings(optimizedBookings as Schedule[]);
+    optimizedBookings.forEach((booking) => {
+      updateBooking(booking.venueName, booking.slotId, booking.eventSize);
+    });
   };
 
   const clearBookings = () => {
@@ -222,20 +235,26 @@ export default function SchedulerPage() {
 
                   return (
                     <td key={slot.id} className="p-3 text-center">
-                      <select
-                        className="border rounded px-2 py-1"
-                        value={value}
-                        onChange={(e) => updateBooking(venue.name, slot.id, Number(e.target.value))}
-                      >
-                        {eventSizes.map(
-                          (size) =>
-                            size <= venue.capacity && (
-                              <option key={size} value={size}>
-                                {size === 0 ? "None" : size}
-                              </option>
-                            ),
-                        )}
-                      </select>
+                      {!!prevBookings.find((b) => b.venueName === venue.name && slot.id === 1) ? (
+                        <span className="text-green-600">Rest and Clean</span>
+                      ) : (
+                        <select
+                          className="border rounded px-2 py-1"
+                          value={value}
+                          onChange={(e) =>
+                            updateBooking(venue.name, slot.id, Number(e.target.value))
+                          }
+                        >
+                          {eventSizes.map(
+                            (size) =>
+                              size <= venue.capacity && (
+                                <option key={size} value={size}>
+                                  {size === 0 ? "None" : size}
+                                </option>
+                              ),
+                          )}
+                        </select>
+                      )}
                     </td>
                   );
                 })}

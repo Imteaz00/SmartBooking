@@ -9,7 +9,7 @@ export default async function fetchScheduleByDate(date: Date) {
     if (!res.ok) {
       throw new Error(`Server error: ${res.statusText}`);
     }
-    return res.json();
+    return await res.json();
   } catch (error) {
     console.error("Error fetching schedule:", error);
     throw error;

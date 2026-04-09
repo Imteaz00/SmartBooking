@@ -3,6 +3,7 @@ import {
   getAllEvents,
   getAllSlots,
   getAllVenues,
+  getLastSlots,
   greedy,
   hillClimbing,
   saveSchedules,
@@ -18,6 +19,7 @@ routers.get("/venues", getAllVenues);
 routers.get("/slots", getAllSlots);
 routers.get("/events", getAllEvents);
 routers.get("/schedule/:date", getScheduleByDate);
+routers.get("/lastSlots/:day", getLastSlots);
 routers.get("/schedule/dailyProfitByMonth/:date", getDailyProfitByMonth);
 routers.post("/schedules", saveSchedules);
 

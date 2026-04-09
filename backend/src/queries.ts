@@ -4,12 +4,12 @@ import { schedule } from "./schema.js";
 import { NewSchedule } from "./types.js";
 
 export const getAllVenues = async () => {
-  const venues = await db.query.venue.findMany();
+  const venues = await db.query.venue.findMany({ orderBy: (v, { asc }) => [asc(v.capacity)] });
   return venues;
 };
 
 export const getAllSlots = async () => {
-  const slots = await db.query.slot.findMany();
+  const slots = await db.query.slot.findMany({ orderBy: (s, { asc }) => [asc(s.id)] });
   return slots;
 };
 
